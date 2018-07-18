@@ -1,0 +1,17 @@
+{
+  "name": "a-simple-react-router-v4-tutorial",
+  "version": "1.0.0",
+  "description":
+    "https://medium.com/@pshrmn/a-simple-react-router-v4-tutorial-7f23ff27adf",
+  "keywords": [],
+  "main": "index.js",
+  "dependencies": {
+    "@material-ui/core": "1.2.1",
+    "@material-ui/icons": "1.1.0",
+    "material-ui": "0.20.1",
+    "react": "16.4.1",
+    "react-dom": "16.4.1",
+    "react-fontawesome": "1.6.1",
+    "react-router-dom": "4.3.1"
+  }
+}
