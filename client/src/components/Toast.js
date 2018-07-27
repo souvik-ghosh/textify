@@ -34,7 +34,7 @@ const styles1 = theme => ({
     backgroundColor: amber[700],
   },
   icon: {
-    fontSize: 20,
+    fontSize: 17,
   },
   iconVariant: {
     opacity: 0.9,
@@ -120,7 +120,7 @@ class Toast extends React.Component {
           autoHideDuration={this.props.duration || 6000}
           onClose={this.props.onClose || this.handleClose}
         >
-          <MySnackbarContentWrapper style={{fontSize: 18}}
+          <MySnackbarContentWrapper style={{fontSize: 17}}
             onClose={this.props.onClose || this.handleClose}
             variant={this.props.variant}
             message={this.props.message}

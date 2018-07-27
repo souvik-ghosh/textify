@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Manager, Target, Popper } from 'react-popper';
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Collapse from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import Portal from '@material-ui/core/Portal';
@@ -15,9 +14,6 @@ import Link from 'react-router-dom/Link';
 
 
 const styles = theme => ({
-  root: {
-    display: 'flex',
-  },
   paper: {
     marginRight: theme.spacing.unit * 2,
   },
@@ -27,9 +23,12 @@ const styles = theme => ({
 });
 
 class AccountMenu extends React.Component {
-  state = {
-    open: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+    };
+  }
 
   handleToggle = () => {
     this.setState(state => ({ open: !state.open }));
@@ -43,9 +42,11 @@ class AccountMenu extends React.Component {
     this.setState({ open: false });
   };
 
+  
   render() {
     const { classes } = this.props;
     const { open } = this.state;
+    document.getElementById('root').onclick = this.handleClose;
 
     return (
       <div className={classes.root}>
@@ -72,16 +73,14 @@ class AccountMenu extends React.Component {
               eventsEnabled={open}
               className={classNames({ [classes.popperClose]: !open })}
             >
-              <ClickAwayListener onClickAway={this.handleClose}>
-                <Collapse in={open} id="menu-list-collapse" style={{ transformOrigin: '0 0 0' }}>
-                  <Paper style={{ margin: 3 }}>
-                    <MenuList role="menu" style={{paddingTop: '0', paddingBottom: '0'}}>
-                      <MenuItem onClick={this.handleClose}>My account</MenuItem>
-                      <Link to='/logout' style={{ textDecoration: "none", color: "blue"}}><MenuItem onClick={this.handleClose}>Logout</MenuItem></Link>
-                    </MenuList>
-                  </Paper>
-                </Collapse>
-              </ClickAwayListener>
+              <Collapse in={open} id="menu-list-collapse" >
+                <Paper style={{ margin: 3 }}>
+                  <MenuList role="menu" style={{ paddingTop: '0', paddingBottom: '0' }}>
+                    {this.props.loggedIn && <MenuItem onClick={this.handleClose}>My account</MenuItem>}
+                    <Link to={this.props.loggedIn ? '/logout' : '/login'} style={{ textDecoration: "none", color: "blue" }}><MenuItem onClick={this.handleClose}>{this.props.loggedIn ? 'Logout' : 'Login'}</MenuItem></Link>
+                  </MenuList>
+                </Paper>
+              </Collapse>
             </Popper>
           </Portal>
         </Manager>

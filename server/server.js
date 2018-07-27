@@ -14,8 +14,6 @@ const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo')(session);
 
 
-      
-const DIST_DIR = path.join(__dirname, "dist");
 const PORT = process.env.PORT || 5000;
 const app = express();
 
@@ -56,7 +54,7 @@ app.use('/user/', user);
 app.post('/user', (req, res) => {
   console.log('user signup');
   req.session.username = req.body.username;
-  res.end()
+  res.send('success');
 })
 
 const readFile = util.promisify(fs.readFile);

@@ -11,7 +11,6 @@ const horizontal = {
 
 const span = {
   fontSize: 14,
-  fontFamily: "cursive",
   paddingLeft: 10,
   paddingRight: 10,
   color: "#696969",

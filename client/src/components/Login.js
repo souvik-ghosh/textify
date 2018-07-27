@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -9,10 +9,9 @@ import googleIcon from "../icons/google.png";
 import facebookIcon from "../icons/facebook.png";
 import CustomDivider from "./CustomDivider";
 import FormHelperText from '@material-ui/core/FormHelperText';
-import Toast from './Toast';
-import Loader from './Loader';
+import { Redirect } from 'react-router-dom';
 
-const styles = theme => ({
+const styles = () => ({
   formText: {
     fontSize: 13
   },
@@ -25,11 +24,9 @@ const styles = theme => ({
   },
 });
 
-class Login extends React.Component {
+class Login extends Component {
   constructor(props) {
     super(props);
-    // create a ref to store the textInput DOM element
-    this.emailInput = React.createRef();
     //this.focusTextInput = this.focusTextInput.bind(this);
     this.state = {
       loading: false,
@@ -38,19 +35,7 @@ class Login extends React.Component {
       password: '',
       email_helper: '',
       password_helper: '',
-      toast: {
-        open: false,
-        msg: '',
-        variant: null
-      },
-      redirectTo: this.props.redirectTo || '/',
     };
-  }
-
-  closeToast = () => {
-    this.setState({
-      toast: { open: false }
-    })
   }
 
   handleSubmit = () => {
@@ -72,16 +57,15 @@ class Login extends React.Component {
         if (response.status === 200) {
           // update Main state
           response.json();
-
           this.setState({
-            loading: true, 
-            toast: {
-              open: true,
-              variant: 'error',
-              msg: 'Successfuly logged in !'
-            } 
+            loading: true,
+            redirectTo: this.props.redirectTo || '/'
           });
-          
+          this.props.openToast({
+            open: true,
+            variant: 'success',
+            msg: 'Successfuly logged in !'
+          })
           this.props.updateUser({
             isAuthenticated: true,
             username: response.username,
@@ -89,13 +73,11 @@ class Login extends React.Component {
 
           window.location.reload(true);
         } else {
-          this.setState({ 
-            toast: {
-              open: true,
-              variant: 'error',
+          this.props.openToast({
+            open: true,
+            variant: 'error',
               msg: 'Wrong Username/Password !'
-            } 
-          });
+          })
         }
       })
       .catch(error => console.log(error));
@@ -112,13 +94,11 @@ class Login extends React.Component {
 
   handleLoginClick = () => {
     if (!this.state.email || !this.state.password) {
-      this.setState({ 
-        toast: {
-          open: true,
-          variant: 'warning',
-          msg: "Enter your email and password first!"
-        } 
-      });
+      this.props.openToast({
+        open: true,
+        variant: 'warning',
+        msg: "Enter your email and password first!"
+      })
       return;
     }
     this.handleSubmit();
@@ -129,14 +109,11 @@ class Login extends React.Component {
   render() {
     const { classes } = this.props;
 
-    const {toast} = this.state;
-
     if (this.props.loggedIn) {
-      window.location.href = this.state.redirectTo;
-      return (<div className="centered-flex"><Loader /></div>);
+      //this.props.showLoader();
+      //window.location.href = this.props.redirectTo || '/';
+      return <Redirect to={this.props.redirectTo ? this.props.redirectTo : '/'} />
     }
-
-    if (this.state.loading) return (<div className="centered-flex"><Loader /></div>);
 
     return (
       <div className={classes.login}>
@@ -219,16 +196,6 @@ class Login extends React.Component {
             </div>
           </div>
         </Card>
-        {
-        // Toast message
-          toast.open &&
-          <Toast
-            open={toast.open}
-            onClose={this.closeToast}
-            variant={toast.variant}
-            message={toast.msg}
-          />
-        }
       </div>
     );
   }

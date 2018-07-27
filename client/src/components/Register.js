@@ -1,10 +1,3 @@
-// todo npm react 16
-
-
-//UNSAFE__componentWillMount //---- use
-
-
-
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
@@ -18,7 +11,7 @@ import facebookIcon from "../icons/facebook.png";
 import CustomDivider from "./CustomDivider";
 import FormHelperText from '@material-ui/core/FormHelperText';
 
-const styles = theme => ({
+const styles = () => ({
   formText: {
     fontSize: 13
   },
@@ -36,9 +29,9 @@ class Login extends React.Component {
     super(props);
 
     const obj = {
-      val:    null,
+      val: null,
       helper: null,
-      err:    false
+      err: false
     };
 
     this.state = {
@@ -46,11 +39,13 @@ class Login extends React.Component {
       email: obj,
       password1: obj,
       password2: obj,
-      name: obj
+      name: obj,
+      redirectTo: null,
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
 
   handleCheckbox = () => {
     this.setState({ checked: !this.state.checked });
@@ -61,10 +56,10 @@ class Login extends React.Component {
     const input_value = event.target.value;
 
     this.setState({
-      [input_name] : {
-        val:    input_value,
+      [input_name]: {
+        val: input_value,
         helper: '',
-        err:    false,
+        err: false,
       }
     });
   };
@@ -88,16 +83,16 @@ class Login extends React.Component {
 
     switch (input_name) {
       case 'name':
-        err_msg = !input_value ? 'Name must not be empty !' : ( !testRegEx('name', input_value) ? 'Please enter a valid name !' : null );
+        err_msg = !input_value ? 'Name must not be empty !' : (!testRegEx('name', input_value) ? 'Please enter a valid name !' : null);
         break;
       case 'email':
-        err_msg = !input_value ? 'Email address must not be empty !' : ( !testRegEx('email', input_value) ? 'Please enter a valid email !' : null );
+        err_msg = !input_value ? 'Email address must not be empty !' : (!testRegEx('email', input_value) ? 'Please enter a valid email !' : null);
         break;
       case 'password1':
-        err_msg = !input_value ? 'Please enter a password !' : ( !testRegEx('password', input_value) ? 'Password must be alphanumeric and minimum six characters long.' : null );
+        err_msg = !input_value ? 'Please enter a password !' : (!testRegEx('password', input_value) ? 'Password must be alphanumeric and minimum six characters long.' : null);
         break;
       case 'password2':
-        err_msg = !input_value ? 'Please enter password again !' : ( (input_value !== this.state.password1) ? 'Passwords dont match !' : null );
+        err_msg = !input_value ? 'Please enter password again !' : ((input_value !== this.state.password1.val) ? 'Passwords dont match !' : null);
         break;
       default:
         break;
@@ -110,49 +105,68 @@ class Login extends React.Component {
       helper: err_msg,
       err: error
     };
-    
+
     this.setState({ [input_name]: state_val });
   };
 
   handleSubmit = () => {
     const data = {
-      username: this.state.email,
-      password: this.state.password1
+      username: this.state.email.val,
+      password: this.state.password1.val
     };
-
     //request to server to add a new username/password
     fetch('/user/', {
       method: "POST",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
+        "Accept": "application/json",
       },
       body: JSON.stringify(data),
     })
-      .then(res => res.json())
+      .then(response => response.json())
       .then(response => {
-        console.log(response);
         if (response._id) {
-          console.log('successful signup');
+          this.props.openToast({
+            open: true,
+            msg: 'Successfully signed up!',
+            variant: 'success'
+          })
           //redirect to login page
           this.setState({
             redirectTo: '/login'
           });
         } else {
-          console.log('username already taken');
+          this.props.openToast({
+            open: true,
+            msg: response.error,
+            variant: 'error'
+          })
         }
       }).catch(error => {
-        console.log('signup error: ');
         console.log(error);
+        this.props.openToast({
+          open: true,
+          msg: 'Something went wrong.',
+          variant: 'error'
+        })
       });
   }
 
-
   handleRegisterClick = (e) => {
     e.preventDefault();
-    const { name, email, password1, password2, ack_checkbox } = this.state;
-    if (!name || !email || !password1 || !password2 || !ack_checkbox) {
-      this.setState({
-        openToast: true
+    const { name, email, password1, password2, checked } = this.state;
+    if (!name.val || !email.val || !password1.val || !password2.val) {
+      this.props.openToast({
+        open: true,
+        msg: 'Please fill up all the fields first !',
+        variant: 'warning'
+      })
+      return;
+    } else if (!checked) {
+      this.props.openToast({
+        open: true,
+        msg: 'You must agree to the terms & conditions !',
+        variant: 'warning'
       })
       return;
     }
@@ -181,7 +195,7 @@ class Login extends React.Component {
             <br />
             <CustomDivider />
             <div style={{ marginTop: 5 }}>
-              <FormHelperText id="name-helper" className="form-helper">{this.state.name.helper}</FormHelperText>
+              <FormHelperText id="name-helper">{this.state.name.helper}</FormHelperText>
               <Input
                 placeholder="Enter your name"
                 className="input"
@@ -193,7 +207,7 @@ class Login extends React.Component {
               />
             </div>
             <div>
-              <FormHelperText id="email-helper" className="form-helper">{this.state.email.helper}</FormHelperText>
+              <FormHelperText id="email-helper">{this.state.email.helper}</FormHelperText>
               <Input
                 placeholder="Enter your email address"
                 className="input"
@@ -205,7 +219,7 @@ class Login extends React.Component {
               />
             </div>
             <div>
-              <FormHelperText id="password1-helper" className="form-helper">{this.state.password1_helper}</FormHelperText>
+              <FormHelperText id="password1-helper">{this.state.password1.helper}</FormHelperText>
               <Input
                 fullWidth
                 placeholder="Enter password"
@@ -217,7 +231,7 @@ class Login extends React.Component {
               />
             </div>
             <div>
-              <FormHelperText id="password2-helper" className="form-helper">{this.state.password2.helper}</FormHelperText>
+              <FormHelperText id="password2-helper">{this.state.password2.helper}</FormHelperText>
               <Input
                 fullWidth
                 placeholder="Enter password again"
@@ -236,7 +250,7 @@ class Login extends React.Component {
               />
               <div className='form-text'>
                 I agree to the terms & conditions
-                </div>
+              </div>
             </div>
             <div className="centeredFlex">
               <Button

@@ -1,14 +1,9 @@
-import React from "react";
-import Button from "@material-ui/core/Button";
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import image from "../icons/ggg.jpg";
+import React, { Component } from "react";
+import { Button, Card, CardActions, CardContent, Chip, IconButton, Tooltip } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 import languages from "./languages";
-import Chip from '@material-ui/core/Chip/Chip.js';
 
-
-class Home extends React.Component {
+class Home extends Component {
   state = {
     file: '',
     imagePreviewUrl: '',
@@ -46,7 +41,7 @@ class Home extends React.Component {
     return;
   };
 
-  _handleSubmit(e) {
+  _handleSubmit = (e) => {
     e.preventDefault();
     // TODO: do something with -> this.state.file
     console.log('handle uploading-', this.state.file);
@@ -66,11 +61,21 @@ class Home extends React.Component {
     });
   }
 
-  _handleImageChange(e) {
+  _handleImageChange = (e) => {
     e.preventDefault();
+    const file_input = document.getElementById('file-input');
     if (!e.target.files[0]) return;
-    let reader = new FileReader();
-    let file = e.target.files[0];
+
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    if ( !(file.type.indexOf('image') >= 0) ) {
+      this.props.openToast({
+        open: true,
+        msg: 'Please upload an image file',
+        variant: 'warning'
+      });
+      return;
+    }
 
     reader.onloadend = () => {
       this.setState({
@@ -78,6 +83,7 @@ class Home extends React.Component {
         imagePreviewUrl: reader.result,
         preview: true,
       });
+      file_input.reset();
     }
 
     reader.readAsDataURL(file)
@@ -86,81 +92,87 @@ class Home extends React.Component {
   render() {
     let { imagePreviewUrl } = this.state;
 
-    if (!this.state.loggedIn) {
-      return 'please login first';
-    }
-
     return (
       <div className="centeredFlex main-app" id="centeredFlex" style={{ marginTop: 10, marginBottom: 10 }}>
         <div className="main-card-left content-card">
           <Card className="content-card-inner">
-            <CardContent className="centered" style={{ paddingBottom: 0 }}>
-              <img alt="Sign in with Google" src={imagePreviewUrl ? imagePreviewUrl : image} height="225" width="275" />
-            </CardContent>
-            <CardActions className="centeredFlex" style={{ minHeight: 75, paddingLeft: 15, paddingRight: 15 }}>
-              {
-                !this.state.loggedIn ? <p> Login </p>
-                :
-                !this.state.preview ?
+            {
+              !this.state.preview ?
+                <div className="centeredFlex" style={{ height: '-webkit-fill-available' }}>
                   <Button className="button white" color="primary" variant="raised" onClick={this.handleClick}>
                     Choose an image
                   </Button>
-                  :
-                  <div className="inline-flex">
-                    <div>
-                      <div className="flex flex-start column">
-                        <div style={{marginBottom: 5}}>{this.state.chipData[0] ? 'Specify another' : 'Specify language'}</div>
-                        <select className="custom-select" onChange={e => this.handleSelect(e)}>
-                          <option value="none" label="Choose..."></option>
+                </div>
+                :
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className="overlay-preview" style={{ alignSelf: 'flex-end' }}>
+                    <Tooltip title="Cancel">
+                      <IconButton onClick={() => this.setState({ preview: false })}>
+                        <CloseIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                  <CardContent className="centered" style={{ paddingBottom: 0 }}>
+                    <img alt="img" src={imagePreviewUrl} height="260" width="335" />
+                  </CardContent>
+                  <CardActions className="centeredFlex" style={{ minHeight: 105, paddingLeft: 15, paddingRight: 15 }}>
+                    <div className="inline-flex justify-start align-center">
+                      <div className="language-chooser">
+                        <div>
+                          <div style={{ marginBottom: 5 }}>{this.state.chipData[0] ? 'Specify another' : 'Specify language'}</div>
+                          <select className="custom-select" onChange={e => this.handleSelect(e)}>
+                            <option value="none" label="Choose..."></option>
+                            {
+                              Object.keys(languages).map((key) => {
+                                console.log(key, languages[key]);
+                                return <option value={key} key={key} label={languages[key]}></option>;
+                              })
+                            }
+                          </select>
+                        </div>
+                        <div className="flex start wrap" style={{ maxWidth: 200 }}>
                           {
-                            Object.keys(languages).map((key) => {
-                              console.log(key, languages[key]);
-                              return <option value={key} key={key} label={languages[key]}></option>;
+                            this.state.chipData.map(key => {
+                              return (
+                                <Chip
+                                  key={key}
+                                  label={languages[key]}
+                                  onDelete={this.handleChipDelete(key)}
+                                  className="chip"
+                                />
+                              );
                             })
                           }
-                        </select>
+                        </div>
                       </div>
-                      <div className="flex start wrap" style={{ maxWidth: 200 }}>
-                        {this.state.chipData.map(key => {
-                          return (
-                            <Chip
-                              key={key}
-                              label={languages[key]}
-                              onDelete={this.handleChipDelete(key)}
-                              className="chip"
-                            />
-                          );
-                        })}
+                      <div className="auto-left">
+                        <Button className="button" variant="raised" color="primary">Go</Button>
                       </div>
                     </div>
 
-                    <Button className='button auto-left white' variant="raised" color="primary">Go</Button>
-                  </div>
-              }
-              <div style={{ display: 'none' }}>
-                <input className="fileInput"
-                  type="file"
-                  ref={this.fileInput}
-                  onChange={(e) => this._handleImageChange(e)}
-                />
-              </div>
-            </CardActions>
+
+                  </CardActions>
+
+                </div>
+            }
+            <div style={{ display: 'none' }}>
+            <form id="file-input">
+              <input
+                className="fileInput"
+                type="file"
+                ref={this.fileInput}
+                onChange={(e) => this._handleImageChange(e)}
+              />
+            </form>
+            </div>
           </Card>
         </div>
         <div className="spacing"></div>
         <div className="main-card-right content-card">
           <Card className="content-card-inner">
-            <CardContent>
+            <CardContent style={{ height: 295 }}>
               text
             </CardContent>
-            <CardActions>
-              <Button size="small" color="primary">
-                Share
-              </Button>
-              <Button size="small" color="primary">
-                Learn More
-              </Button>
-            </CardActions>
           </Card>
         </div>
       </div>

@@ -17,8 +17,8 @@ function Loader(props) {
       <CircularProgress
         className={classes.progress}
         style={{ color: blue[500] }}
-        thickness={thickness || 5}
-        size={size || 120}
+        thickness={thickness || 4}
+        size={size || 100}
       />
     </div>
   );
