@@ -7,7 +7,7 @@ const path = require("path"),
 const passport = require('./passport');
 const bodyParser = require('body-parser');
 
-const dbConnection = require('../database');
+const dbConnection = require('./database');
 const user = require('./routes/user');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
