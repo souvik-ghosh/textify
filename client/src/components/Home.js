@@ -4,13 +4,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import languages from "./languages";
 
 class Home extends Component {
-  state = {
-    file: '',
-    imagePreviewUrl: '',
-    preview: false,
-    chipData: [],
-  };
-
   constructor(props) {
     super(props);
     console.log(props.loggedIn)
@@ -23,6 +16,7 @@ class Home extends Component {
       preview: false,
       chipData: [],
       loggedIn: props.loggedIn,
+      output: 'Output will be shown here'
     };
   }
 
@@ -112,8 +106,8 @@ class Home extends Component {
                       </IconButton>
                     </Tooltip>
                   </div>
-                  <CardContent className="centered" style={{ paddingBottom: 0 }}>
-                    <img alt="img" src={imagePreviewUrl} height="260" width="335" />
+                  <CardContent className="centered" style={{ paddingBottom: 0, paddingTop: 35 }}>
+                    <img alt="img" src={imagePreviewUrl} height="240" width="320" />
                   </CardContent>
                   <CardActions className="centeredFlex" style={{ minHeight: 105, paddingLeft: 15, paddingRight: 15 }}>
                     <div className="inline-flex justify-start align-center">
@@ -171,7 +165,7 @@ class Home extends Component {
         <div className="main-card-right content-card">
           <Card className="content-card-inner">
             <CardContent style={{ height: 295 }}>
-              text
+              { this.state.output }
             </CardContent>
           </Card>
         </div>

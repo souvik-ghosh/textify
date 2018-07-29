@@ -10,6 +10,7 @@ import google from "../icons/google.png";
 import facebookIcon from "../icons/facebook.png";
 import CustomDivider from "./CustomDivider";
 import FormHelperText from '@material-ui/core/FormHelperText';
+import USER from "../api/user";
 
 const styles = () => ({
   formText: {
@@ -89,7 +90,7 @@ class Login extends React.Component {
         err_msg = !input_value ? 'Email address must not be empty !' : (!testRegEx('email', input_value) ? 'Please enter a valid email !' : null);
         break;
       case 'password1':
-        err_msg = !input_value ? 'Please enter a password !' : (!testRegEx('password', input_value) ? 'Password must be alphanumeric and minimum six characters long.' : null);
+        err_msg = !input_value ? 'Please enter a password !' : ( !input_value.testRegEx('password') ? 'Password must be alphanumeric and minimum six characters long.' : null);
         break;
       case 'password2':
         err_msg = !input_value ? 'Please enter password again !' : ((input_value !== this.state.password1.val) ? 'Passwords dont match !' : null);
@@ -110,46 +111,38 @@ class Login extends React.Component {
   };
 
   handleSubmit = () => {
-    const data = {
+    const user = {
       username: this.state.email.val,
       password: this.state.password1.val
-    };
+    }
     //request to server to add a new username/password
-    fetch('/user/', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Accept": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then(response => response.json())
-      .then(response => {
-        if (response._id) {
-          this.props.openToast({
-            open: true,
-            msg: 'Successfully signed up!',
-            variant: 'success'
-          })
-          //redirect to login page
-          this.setState({
-            redirectTo: '/login'
-          });
-        } else {
-          this.props.openToast({
-            open: true,
-            msg: response.error,
-            variant: 'error'
-          })
-        }
-      }).catch(error => {
-        console.log(error);
+    USER.create(user)
+    .then(response => {
+      if (response._id) {
         this.props.openToast({
           open: true,
-          msg: 'Something went wrong.',
+          msg: 'Successfully signed up!',
+          variant: 'success'
+        })
+        //redirect to login page
+        this.setState({
+          redirectTo: '/login'
+        });
+      } else {
+        this.props.openToast({
+          open: true,
+          msg: response.error,
           variant: 'error'
         })
-      });
+      }
+    })
+    .catch(error => {
+      this.props.openToast({
+        open: true,
+        msg: 'Something went wrong.',
+        variant: 'error'
+      })
+    })
   }
 
   handleRegisterClick = (e) => {

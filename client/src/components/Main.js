@@ -7,6 +7,7 @@ import Logout from "./Logout";
 import Loader from "./Loader";
 import Toast from './Toast';
 import Header from "./Header";
+import USER from "../api/user";
 
 class Main extends React.Component {
   constructor() {
@@ -36,14 +37,9 @@ class Main extends React.Component {
   }
 
   getUser = () => {
-    fetch('/user/', {
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin"
-    })
-      .then(response => response.json())
+    USER.get()
       .then(response => {
-        console.log('Get user response: ')
-        console.log(response);
+        console.log(response)
         if (response.user) {
           this.setState({
             loggedIn: true,
