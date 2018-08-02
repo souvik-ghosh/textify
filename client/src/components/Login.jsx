@@ -10,7 +10,7 @@ import facebookIcon from "../icons/facebook.png";
 import CustomDivider from "./CustomDivider";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import { Redirect } from "react-router-dom";
-import USER from "../api/user";
+import { loginUser } from "../api";
 
 const styles = () => ({
   formText: {
@@ -40,12 +40,12 @@ class Login extends Component {
   }
 
   handleSubmit = () => {
-    const user = {
+    const userObj = {
       username: this.state.email,
       password: this.state.password
     };
 
-    USER.login(user)
+    loginUser(userObj)
       .then(response => {
         if (response.username) {
           this.setState({
@@ -98,8 +98,6 @@ class Login extends Component {
     const { classes } = this.props;
 
     if (this.props.loggedIn) {
-      //this.props.showLoader();
-      //window.location.href = this.props.redirectTo || '/';
       return (
         <Redirect to={this.props.redirectTo ? this.props.redirectTo : "/"} />
       );

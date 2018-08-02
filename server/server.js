@@ -12,6 +12,7 @@ const user = require('./routes/user');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo')(session);
+const config = require('./config.json');
 
 
 const PORT = process.env.PORT || 5000;
@@ -59,8 +60,6 @@ app.post('/user', (req, res) => {
 
 const readFile = util.promisify(fs.readFile);
 
-const api_url = "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyAbOxH-4pY6k2hqnjj-OTMNuotQxKgS95A";
-
 async function getStuff(file) {
   const encoded = await file.toString('base64');
   let request_body = {
@@ -83,7 +82,7 @@ async function getStuff(file) {
 
   request_body = await JSON.stringify(request_body);
 
-  const response = await fetch(api_url, {
+  const response = await fetch(config.api_url_vision , {
     method: 'POST',
     body: request_body
   });
@@ -108,5 +107,4 @@ app.post('/translate', (req, res) => {
 //Start the server
 app.listen(PORT, () => {
   console.log(`server started on ${PORT}`);
-
 });

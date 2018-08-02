@@ -1,15 +1,29 @@
-import { get, post } from ".";
+import { get, post } from "./main";
 
-const USER = {
-  get: async () => {
-    return await get("/user/");
-  },
-  login: async user => {
-    return await post("/user/login", user);
-  },
-  create: async user => {
-    return await post("/user/", user);
-  }
-};
+/**
+ * Fetch logged in user from server
+ * @returns {Promise<Response>} JSON { user }
+ */
+const fetchUser = async () => {
+  return await get("/user/");
+}
 
-export default USER;
+/**
+ * Request the server to log in user
+ * @param {Object} user plain JS object
+ * @returns {Promise<Response>} JSON {id: string}
+ */
+const loginUser = async user => {
+  return await post("/user/login", user);
+}
+
+/**
+ * Request the server to create a new user
+ * @param {Object} user plain JS object
+ * @returns {Promise<Response>} JSON {id: string}
+ */
+const createUser = async user => {
+  return await post("/user/", user);
+}
+
+export { fetchUser, loginUser, createUser }

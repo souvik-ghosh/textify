@@ -7,7 +7,7 @@ import Logout from "./Logout";
 import Loader from "./Loader";
 import Toast from './Toast';
 import Header from "./Header";
-import USER from "../api/user";
+import { fetchUser } from "../api";
 
 class Main extends React.Component {
   constructor() {
@@ -37,9 +37,8 @@ class Main extends React.Component {
   }
 
   getUser = () => {
-    USER.get()
+    fetchUser()
       .then(response => {
-        console.log(response)
         if (response.user) {
           this.setState({
             loggedIn: true,
@@ -47,7 +46,6 @@ class Main extends React.Component {
             loading: false,
           });
         } else {
-          console.log('Get user: no user');
           this.setState({
             loggedIn: false,
             username: null,
@@ -58,6 +56,7 @@ class Main extends React.Component {
       .catch(err => console.log(err));
   }
 
+  /** @function updateUser */
   updateUser(userObject) {
     this.setState(userObject)
   }

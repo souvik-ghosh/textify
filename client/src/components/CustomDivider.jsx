@@ -17,11 +17,10 @@ const span = {
   background: 'white'
 }
 
-const CustomDivider = (props) => {
-
+const CustomDivider = () => {
   return (
     <div style={horizontal}>
-      <span style={span}> OR </span>
+      <span style={span}> or </span>
     </div>
   )
 }
